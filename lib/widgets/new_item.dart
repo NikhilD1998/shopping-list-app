@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:shopping_list_app/data/categories.dart';
 
@@ -11,6 +9,12 @@ class NewItem extends StatefulWidget {
 }
 
 class _NewItemState extends State<NewItem> {
+  final _formKey = GlobalKey<FormState>();
+
+  void _saveItem() {
+    _formKey.currentState!.validate();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,6 +24,7 @@ class _NewItemState extends State<NewItem> {
       body: Padding(
         padding: EdgeInsets.all(12),
         child: Form(
+          key: _formKey,
           child: Column(
             children: [
               TextFormField(
@@ -30,7 +35,13 @@ class _NewItemState extends State<NewItem> {
                   ),
                 ),
                 validator: (value) {
-                  return 'demo...';
+                  if (value == null ||
+                      value.isEmpty ||
+                      value.trim().length <= 1 ||
+                      value.trim().length > 50) {
+                    return 'Must be between 1 and 50 Characters';
+                  }
+                  return null;
                 },
               ),
               Row(
@@ -43,6 +54,16 @@ class _NewItemState extends State<NewItem> {
                           'Quantity',
                         ),
                       ),
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null ||
+                            value.isEmpty ||
+                            int.tryParse(value) == null ||
+                            int.parse(value)! <= 0) {
+                          return 'Must be a valid positive number';
+                        }
+                        return null;
+                      },
                       initialValue: '1',
                     ),
                   ),
@@ -84,7 +105,7 @@ class _NewItemState extends State<NewItem> {
                     ),
                   ),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: _saveItem,
                     child: Text(
                       'Add Item',
                     ),
